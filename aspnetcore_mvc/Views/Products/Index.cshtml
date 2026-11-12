@@ -1,0 +1,111 @@
+@model IEnumerable<GlowCare_AspNetCore_MVC.Models.Product>
+@{
+    ViewData["Title"] = "Danh Mục Mỹ Phẩm & Hoạt Chất";
+    var categories = ViewBag.Categories as List<GlowCare_AspNetCore_MVC.Models.Category> ?? new();
+}
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar Filter -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+                <h5 class="fw-bold mb-3"><i class="bi bi-funnel text-danger me-2"></i>Bộ Lọc Sản Phẩm</h5>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-uppercase text-muted">Danh Mục</label>
+                    <div class="d-grid gap-1">
+                        <a asp-action="Index" class="btn btn-sm text-start @(ViewBag.CurrentCategory == "Tất cả" ? "btn-dark" : "btn-light")">
+                            Tất cả
+                        </a>
+                        @foreach (var cat in categories)
+                        {
+                            <a asp-action="Index" asp-route-category="@cat.CategoryName" 
+                               class="btn btn-sm text-start @(ViewBag.CurrentCategory == cat.CategoryName ? "btn-dark" : "btn-light")">
+                                @cat.CategoryName
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-uppercase text-muted">Loại Da Phù Hợp</label>
+                    <div class="d-grid gap-1">
+                        <a asp-action="Index" asp-route-skinType="Tất cả" class="btn btn-sm text-start @(ViewBag.CurrentSkinType == "Tất cả" ? "btn-outline-danger active" : "btn-light")">
+                            Mọi loại da
+                        </a>
+                        <a asp-action="Index" asp-route-skinType="Da dầu" class="btn btn-sm text-start @(ViewBag.CurrentSkinType == "Da dầu" ? "btn-outline-danger active" : "btn-light")">
+                            Da dầu & Mụn
+                        </a>
+                        <a asp-action="Index" asp-route-skinType="Da nhạy cảm" class="btn btn-sm text-start @(ViewBag.CurrentSkinType == "Da nhạy cảm" ? "btn-outline-danger active" : "btn-light")">
+                            Da nhạy cảm & Dễ đỏ
+                        </a>
+                        <a asp-action="Index" asp-route-skinType="Da khô" class="btn btn-sm text-start @(ViewBag.CurrentSkinType == "Da khô" ? "btn-outline-danger active" : "btn-light")">
+                            Da khô & Căng rát
+                        </a>
+                    </div>
+                </div>
+
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                    <i class="bi bi-arrow-counterclockwise"></i> Đặt lại bộ lọc
+                </a>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold font-serif mb-0">
+                    Danh Sách Sản Phẩm (@Model.Count())
+                </h4>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-dark dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                        Sắp xếp theo
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-sort="featured">Nổi bật nhất</a></li>
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-sort="price-asc">Giá tăng dần</a></li>
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-sort="price-desc">Giá giảm dần</a></li>
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-sort="rating">Đánh giá cao</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                @foreach (var item in Model)
+                {
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card card-product h-100 p-3">
+                            <div class="position-relative mb-2">
+                                <img src="@item.ImageUrl" class="card-img-top rounded-3" alt="@item.ProductName" style="height: 200px; object-fit: cover;">
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column">
+                                <span class="text-muted small">@item.Brand?.BrandName</span>
+                                <h6 class="card-title fw-bold mt-1 text-truncate-2" style="min-height: 48px;">
+                                    <a asp-action="Details" asp-route-id="@item.ProductId" class="text-dark text-decoration-none">
+                                        @item.ProductName
+                                    </a>
+                                </h6>
+                                <div class="mt-auto pt-2">
+                                    <div class="fw-bold text-danger fs-5 mb-2">@item.Price.ToString("N0") ₫</div>
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm py-2 px-2 fw-semibold flex-fill d-flex align-items-center justify-content-center gap-1 shadow-xs" title="Thêm sản phẩm này vào giỏ hàng">
+                                            <i class="bi bi-cart-plus"></i>
+                                            <span>Thêm Giỏ</span>
+                                        </button>
+                                        <a asp-controller="Cart" asp-action="BuyNow" asp-route-productId="@item.ProductId" class="btn btn-rose btn-sm py-2 px-2 fw-semibold flex-fill text-center d-flex align-items-center justify-content-center gap-1 shadow-xs" title="Mua ngay và chuyển đến thanh toán">
+                                            <i class="bi bi-lightning-charge-fill"></i>
+                                            <span>Mua Ngay</span>
+                                        </a>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

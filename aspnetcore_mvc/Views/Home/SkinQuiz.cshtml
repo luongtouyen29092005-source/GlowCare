@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Trắc Nghiệm Chẩn Đoán Routine Da Liễu";
+}
+
+<div class="container py-5">
+    <div class="text-center max-w-xl mx-auto mb-5" style="max-width: 600px;">
+        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-semibold mb-2">
+            <i class="bi bi-magic me-1"></i> Chu Trình Khoa Học
+        </span>
+        <h2 class="font-serif fw-bold">Chẩn Đoán Loại Da & Phác Đồ Routine</h2>
+        <p class="text-muted">Trả lời 3 câu hỏi nhanh dưới đây để bác sĩ da liễu và thuật toán MVC tư vấn chu trình mỹ phẩm phù hợp nhất cho bạn.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mx-auto" style="max-width: 750px;">
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark"><span class="badge bg-danger rounded-circle me-2">1</span> Khi thức dậy vào buổi sáng, vùng chữ T (trán, mũi, cằm) của bạn cảm thấy như thế nào?</h5>
+            <div class="d-grid gap-2 mt-3">
+                <label class="btn btn-outline-secondary text-start p-3 rounded-3 d-flex align-items-center gap-3">
+                    <input type="radio" name="q1" checked />
+                    <div>
+                        <b>Rất nhiều dầu nhờn, bóng loáng</b>
+                        <div class="small text-muted">Lỗ chân lông to, dễ xuất hiện sợi bã nhờn và mụn</div>
+                    </div>
+                </label>
+                <label class="btn btn-outline-secondary text-start p-3 rounded-3 d-flex align-items-center gap-3">
+                    <input type="radio" name="q1" />
+                    <div>
+                        <b>Khô căng, thô ráp hoặc hơi ngứa</b>
+                        <div class="small text-muted">Thiếu hụt màng ẩm lipid, da dễ bong tróc vào mùa đông</div>
+                    </div>
+                </label>
+                <label class="btn btn-outline-secondary text-start p-3 rounded-3 d-flex align-items-center gap-3">
+                    <input type="radio" name="q1" />
+                    <div>
+                        <b>Dầu ở mũi trán nhưng khô ở hai bên má</b>
+                        <div class="small text-muted">Đặc trưng điển hình của làn da hỗn hợp thiên dầu</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark"><span class="badge bg-danger rounded-circle me-2">2</span> Vấn đề da bạn đang muốn tập trung cải thiện nhất?</h5>
+            <div class="d-grid gap-2 mt-3">
+                <label class="btn btn-outline-secondary text-start p-3 rounded-3">
+                    <input type="radio" name="q2" checked class="me-2" />
+                    <b>Mụn ẩn, mụn viêm & thâm đỏ sau mụn</b> (Gợi ý hoạt chất: BHA 2%, Niacinamide, Centella)
+                </label>
+                <label class="btn btn-outline-secondary text-start p-3 rounded-3">
+                    <input type="radio" name="q2" class="me-2" />
+                    <b>Da nhạy cảm, dễ kích ứng, đỏ rát</b> (Gợi ý hoạt chất: B5 Panthenol, Ceramide, Rau má)
+                </label>
+            </div>
+        </div>
+
+        <div class="text-center pt-3">
+            <a asp-controller="Products" asp-action="Index" asp-route-skinType="Da dầu" class="btn btn-rose px-5 py-3 fw-bold fs-5">
+                <i class="bi bi-sparkles me-2"></i> Xem Gợi Ý Sản Phẩm Cho Bạn
+            </a>
+        </div>
+    </div>
+</div>

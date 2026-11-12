@@ -1,0 +1,245 @@
+@model GlowCare_AspNetCore_MVC.Models.SiteSetting
+@{
+    ViewData["Title"] = "Cấu Hình Giao Diện, Màu Sắc & Banner Website";
+}
+
+<div class="container-fluid py-4 px-md-5">
+    <!-- Admin Navigation Tabs -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="font-serif fw-bold mb-1">
+                <i class="bi bi-palette-fill text-danger me-2"></i>Tùy Biến Giao Diện, Banner & Màu Sắc Website
+            </h2>
+            <p class="text-muted small mb-0">Quản trị viên toàn quyền thay đổi hình ảnh banner, mã màu chủ đạo, tên cửa hàng và thanh thông báo</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-boxes me-1"></i> Quản Lý Kho
+            </a>
+            <a asp-action="Orders" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-receipt-cutoff me-1"></i> Quản Lý Đơn Hàng
+            </a>
+            <a asp-action="Categories" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-menu-button-wide me-1"></i> Quản Lý Menu
+            </a>
+            <a asp-action="Users" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-people-fill me-1"></i> Phân Quyền Nhân Viên
+            </a>
+            <a asp-action="SiteSettings" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-palette-fill me-1"></i> Cấu Hình Giao Diện
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Live Preview Banner Box -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-header bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
+            <span class="small fw-bold text-uppercase"><i class="bi bi-eye-fill text-warning me-1"></i> Bản Xem Trước Trực Quan Banner Trang Chủ (Live Preview)</span>
+            <span class="badge bg-danger rounded-pill px-2.5">Tự động cập nhật theo cấu hình bên dưới</span>
+        </div>
+        <div class="position-relative p-4 p-md-5 text-white" style="background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('@Model.HeroImageUrl') center/cover no-repeat; min-height: 260px;">
+            <div class="col-lg-8">
+                <span class="badge rounded-pill px-3 py-1.5 mb-2 text-white fw-bold shadow-sm" style="background-color: @Model.PrimaryColor;">
+                    <i class="bi bi-award-fill me-1"></i> @Model.HeroBadge
+                </span>
+                <h2 class="display-6 fw-bold font-serif mb-2 text-white">@Model.HeroTitle</h2>
+                <p class="lead small mb-3 text-white-50" style="max-width: 650px;">@Model.HeroSubtitle</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm rounded-pill px-4 fw-bold text-white shadow-sm" style="background-color: @Model.PrimaryColor;">
+                        @Model.HeroButtonText <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-light rounded-pill px-3">
+                        <i class="bi bi-stars me-1"></i> Chẩn Đoán Loại Da
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form asp-action="SiteSettings" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row g-4">
+            <!-- 1. Cấu hình Màu sắc Theme -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-danger">
+                        <i class="bi bi-palette2"></i> 1. Tùy Chỉnh Màu Sắc Chủ Đạo Website
+                    </h5>
+                    <p class="text-muted small mb-3">Chọn màu thương hiệu để toàn bộ nút bấm, thanh điều hướng và nhãn giá hiển thị đồng bộ:</p>
+
+                    <!-- Màu Preset Nhanh -->
+                    <label class="form-label small fw-bold">Chọn nhanh tông màu phổ biến:</label>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <button type="button" class="btn btn-sm rounded-pill border px-3" onclick="setPresetColor('#e11d48', '#f43f5e', 'rose')" style="background-color: #fff1f2; color: #be123c;">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: #e11d48;"></span> Dược Mỹ Phẩm Hồng (Rose)
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-pill border px-3" onclick="setPresetColor('#059669', '#10b981', 'emerald')" style="background-color: #ecfdf5; color: #047857;">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: #059669;"></span> Tự Nhiên Xanh Lá (Emerald)
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-pill border px-3" onclick="setPresetColor('#2563eb', '#3b82f6', 'blue')" style="background-color: #eff6ff; color: #1d4ed8;">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: #2563eb;"></span> Y Khoa Xanh Dương (Blue)
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-pill border px-3" onclick="setPresetColor('#d97706', '#f59e0b', 'amber')" style="background-color: #fffbeb; color: #b45309;">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: #d97706;"></span> Sang Trọng Vàng Kim (Amber)
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-pill border px-3" onclick="setPresetColor('#7c3aed', '#8b5cf6', 'purple')" style="background-color: #f5f3ff; color: #6d28d9;">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: #7c3aed;"></span> Quý Tộc Tím (Purple)
+                        </button>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PrimaryColor" class="form-label small fw-bold">Màu chủ đạo (Hex Code)</label>
+                            <div class="input-group">
+                                <input type="color" id="primaryColorPicker" class="form-control form-control-color" value="@Model.PrimaryColor" onchange="document.getElementById('PrimaryColor').value = this.value" />
+                                <input asp-for="PrimaryColor" id="PrimaryColor" class="form-control" placeholder="#e11d48" required oninput="document.getElementById('primaryColorPicker').value = this.value" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="AccentColor" class="form-label small fw-bold">Màu phụ / Nhấn (Accent)</label>
+                            <div class="input-group">
+                                <input type="color" id="accentColorPicker" class="form-control form-control-color" value="@Model.AccentColor" onchange="document.getElementById('AccentColor').value = this.value" />
+                                <input asp-for="AccentColor" id="AccentColor" class="form-control" placeholder="#f43f5e" oninput="document.getElementById('accentColorPicker').value = this.value" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="ThemePreset" class="form-label small fw-bold">Mã Preset Giao diện</label>
+                            <input asp-for="ThemePreset" id="ThemePreset" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Cấu hình Banner Hero & Hình ảnh -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-danger">
+                        <i class="bi bi-image"></i> 2. Cấu Hình Banner & Hình Ảnh Chính
+                    </h5>
+
+                    <div class="mb-3">
+                        <label asp-for="HeroImageUrl" class="form-label small fw-bold">Đường dẫn Hình Ảnh Banner (URL)</label>
+                        <input asp-for="HeroImageUrl" class="form-control" placeholder="https://..." required />
+                        <span class="text-muted" style="font-size: 0.75rem;">* Dán link ảnh chất lượng cao (Unsplash, Cloudinary hoặc host của bạn)</span>
+                    </div>
+
+                    <!-- Gợi ý ảnh đẹp -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Ảnh Banner mẫu sẵn có:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2" style="font-size: 0.75rem;" onclick="setBannerImg('https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1200&q=80')">
+                                <i class="bi bi-image-fill me-1"></i> Lab Dược Mỹ Phẩm Tinh Khiết
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2" style="font-size: 0.75rem;" onclick="setBannerImg('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80')">
+                                <i class="bi bi-image-fill me-1"></i> Serum & Skincare Khoa Học
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2" style="font-size: 0.75rem;" onclick="setBannerImg('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80')">
+                                <i class="bi bi-image-fill me-1"></i> Spa Chăm Sóc Da Chuyên Sâu
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HeroBadge" class="form-label small fw-bold">Huy hiệu nhỏ trên Banner (Badge)</label>
+                        <input asp-for="HeroBadge" class="form-control" placeholder="Phòng Lab Đạt Chuẩn Da Liễu" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HeroTitle" class="form-label small fw-bold">Tiêu đề lớn Banner (Hero Title)</label>
+                        <input asp-for="HeroTitle" class="form-control" placeholder="Giải Pháp Khoa Học Cho Làn Da Hoàn Hảo" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HeroSubtitle" class="form-label small fw-bold">Mô tả phụ Banner (Hero Subtitle)</label>
+                        <textarea asp-for="HeroSubtitle" class="form-control" rows="2" placeholder="Khám phá quy trình dược mỹ phẩm chuẩn chuyên gia da liễu..."></textarea>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="HeroButtonText" class="form-label small fw-bold">Chữ trên nút bấm</label>
+                            <input asp-for="HeroButtonText" class="form-control" placeholder="Khám Phá Sản Phẩm Ngay" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="HeroButtonLink" class="form-label small fw-bold">Liên kết khi bấm nút</label>
+                            <input asp-for="HeroButtonLink" class="form-control" placeholder="/Products" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Cấu hình Thương hiệu, Logo & Thông tin liên hệ -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-danger">
+                        <i class="bi bi-shop"></i> 3. Tên Thương Hiệu, Thanh Thông Báo & Thông Tin Liên Hệ
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="SiteName" class="form-label small fw-bold">Tên Website / Thương hiệu</label>
+                            <input asp-for="SiteName" class="form-control" placeholder="GlowCare Lab" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="LogoText" class="form-label small fw-bold">Chữ hiển thị trên Logo Navbar</label>
+                            <input asp-for="LogoText" class="form-control" placeholder="GlowCare Lab" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Tagline" class="form-label small fw-bold">Slogan thương hiệu</label>
+                            <input asp-for="Tagline" class="form-control" placeholder="Dược Mỹ Phẩm & Chăm Sóc Da Chuyên Sâu" />
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="AnnouncementText" class="form-label small fw-bold">Thanh Thông Báo Chạy Đầu Trang (Top Announcement Bar)</label>
+                            <input asp-for="AnnouncementText" class="form-control" placeholder="🎉 Khai xuân rực rỡ - Miễn phí vận chuyển toàn quốc cho đơn từ 299.000₫" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Hotline" class="form-label small fw-bold">Số Điện Thoại Hotline / CSKH</label>
+                            <input asp-for="Hotline" class="form-control" placeholder="1900 6868" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Email" class="form-label small fw-bold">Email Hỗ Trợ</label>
+                            <input asp-for="Email" class="form-control" placeholder="support@glowcare.vn" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Address" class="form-label small fw-bold">Địa chỉ trụ sở</label>
+                            <input asp-for="Address" class="form-control" placeholder="Số 88 Phố Huế, Hoàn Kiếm, Hà Nội" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-rose btn-lg px-5 py-2.5 rounded-pill shadow fw-bold">
+                <i class="bi bi-check2-circle me-1"></i> Lưu & Áp Dụng Toàn Bộ Giao Diện Website
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function setPresetColor(primary, accent, preset) {
+        document.getElementById('PrimaryColor').value = primary;
+        document.getElementById('primaryColorPicker').value = primary;
+        document.getElementById('AccentColor').value = accent;
+        document.getElementById('accentColorPicker').value = accent;
+        document.getElementById('ThemePreset').value = preset;
+    }
+
+    function setBannerImg(url) {
+        document.getElementById('HeroImageUrl').value = url;
+    }
+</script>

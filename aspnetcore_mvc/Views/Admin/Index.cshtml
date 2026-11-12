@@ -1,0 +1,189 @@
+@model IEnumerable<GlowCare_AspNetCore_MVC.Models.Product>
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm & Tồn Kho (Admin)";
+}
+
+<div class="container-fluid py-4 px-md-5">
+    <!-- Admin Navigation Tabs -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-danger">Quản Trị Toàn Quyền</span>
+                <span class="text-muted small">Thêm, sửa, xóa toàn bộ thông tin sản phẩm và điều chỉnh tồn kho</span>
+            </div>
+            <h2 class="font-serif fw-bold mb-0 text-dark"><i class="bi bi-boxes text-danger me-2"></i>Quản Lý Sản Phẩm & Kho Hàng</h2>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+            <!-- Nút Thêm Sản Phẩm Mới -->
+            <a asp-action="CreateProduct" class="btn btn-rose btn-sm px-3 rounded-pill shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Thêm Sản Phẩm Mới
+            </a>
+
+            @if (User.IsInRole("SUPER_ADMIN"))
+            {
+                <a asp-action="Categories" class="btn btn-outline-danger btn-sm px-3 rounded-pill">
+                    <i class="bi bi-menu-button-wide me-1"></i> Quản Lý Menu
+                </a>
+            }
+
+            <a asp-action="Orders" class="btn btn-outline-success btn-sm px-3 rounded-pill">
+                <i class="bi bi-receipt me-1"></i> Đơn Hàng
+            </a>
+
+            @if (User.IsInRole("SUPER_ADMIN"))
+            {
+                <a asp-action="Users" class="btn btn-outline-warning text-dark btn-sm px-3 rounded-pill">
+                    <i class="bi bi-people-fill me-1"></i> Phân Quyền Nhân Viên
+                </a>
+                <a asp-action="SiteSettings" class="btn btn-outline-danger btn-sm px-3 rounded-pill">
+                    <i class="bi bi-palette-fill me-1"></i> Cấu Hình Giao Diện
+                </a>
+                <a asp-action="SeedDemoData" class="btn btn-outline-info text-dark btn-sm px-3 rounded-pill fw-semibold shadow-sm" onclick="return confirm('Khởi tạo lại toàn bộ dữ liệu mẫu (Sản phẩm, Menu, Tài khoản, Cấu hình) vào CSDL?');">
+                    <i class="bi bi-database-fill-gear me-1"></i> ⚡ Khởi Tạo Dữ Liệu Mẫu
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light border-start border-info border-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-info-circle-fill text-info me-2"></i>Cơ sở dữ liệu đang trống sản phẩm</h5>
+                    <p class="text-muted small mb-0">Hệ thống đã sẵn sàng kết nối. Bạn có thể tự thêm sản phẩm thủ công hoặc nhấn nút bên phải để tự động nạp đầy đủ sản phẩm, menu và tài khoản mẫu vào CSDL.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="SeedDemoData" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> ⚡ Nạp Dữ Liệu Mẫu Ngay
+                    </a>
+                    <a asp-action="CreateProduct" class="btn btn-outline-dark rounded-pill px-3">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm Thủ Công
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Summary Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-primary border-4">
+                <div class="text-muted small fw-semibold">Tổng Số Sản Phẩm</div>
+                <div class="fs-4 fw-bold text-primary">@ViewBag.TotalProducts</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-warning border-4">
+                <div class="text-muted small fw-semibold">Sản Phẩm Sắp Hết Hàng (&lt; 10)</div>
+                <div class="fs-4 fw-bold text-warning">@ViewBag.LowStockCount</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-success border-4">
+                <div class="text-muted small fw-semibold">Ước Tính Giá Trị Tồn Kho</div>
+                <div class="fs-4 fw-bold text-success">@(((decimal)(ViewBag.TotalStockValue ?? 0)).ToString("N0")) ₫</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="fw-bold mb-0">Tất Cả Sản Phẩm Trong CSDL (@Model.Count())</h5>
+            <span class="text-muted small">Nhấn "Sửa" để thay đổi thông tin chi tiết hoặc "Xóa" để gỡ bỏ khỏi website</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th class="ps-4">Mã SP</th>
+                        <th>Hình Ảnh</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Menu / Danh Mục</th>
+                        <th>Giá Bán</th>
+                        <th>Tồn Kho Hiện Tại</th>
+                        <th>Cập Nhật Kho</th>
+                        <th class="text-end pe-4">Thao Tác Admin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4"><code>@item.ProductId</code></td>
+                            <td>
+                                <img src="@item.ImageUrl" alt="@item.ProductName" style="width: 48px; height: 48px; object-fit: cover;" class="rounded-3 border" />
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.ProductName</div>
+                                <div class="small text-muted">@item.Brand?.BrandName • @item.Volume</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@item.Category?.CategoryName</span></td>
+                            <td class="fw-bold text-danger">@item.Price.ToString("N0") ₫</td>
+                            <td>
+                                @if (item.StockCount > 10)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1">Còn @item.StockCount món</span>
+                                }
+                                else if (item.StockCount > 0)
+                                {
+                                    <span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1">Sắp hết (@item.StockCount)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1">Hết hàng (0)</span>
+                                }
+                            </td>
+                            <td>
+                                <form asp-controller="Admin" asp-action="UpdateStock" method="post" class="d-flex gap-1 align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="number" name="newStock" value="@item.StockCount" min="0" max="9999" class="form-control form-control-sm" style="width: 75px;" />
+                                    <button type="submit" class="btn btn-sm btn-outline-dark" title="Cập nhật nhanh tồn kho">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Nút Chỉnh Sửa Sản Phẩm -->
+                                    <a asp-action="EditProduct" asp-route-id="@item.ProductId" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa toàn bộ thông tin sản phẩm">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </a>
+
+                                    @if (User.IsInRole("SUPER_ADMIN"))
+                                    {
+                                        <!-- Nút Xóa Sản Phẩm -->
+                                        <form asp-action="DeleteProduct" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi hệ thống?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa sản phẩm">
+                                                <i class="bi bi-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,221 @@
+@model GlowCare_AspNetCore_MVC.Models.Order
+@{
+    ViewData["Title"] = $"Hóa Đơn Bán Hàng #{Model.OrderId}";
+    var site = (GlowCare_AspNetCore_MVC.Models.SiteSetting?)ViewBag.SiteSetting ?? new GlowCare_AspNetCore_MVC.Models.SiteSetting();
+    var customerName = Model.Customer?.FullName ?? "Khách hàng thân thiết";
+    var customerPhone = Model.Customer?.Phone ?? "Chưa cập nhật";
+    var customerEmail = Model.Customer?.Email ?? "Chưa cập nhật";
+}
+
+<!-- Print Stylesheet -->
+<style>
+    @@media print {
+        body {
+            background-color: #fff !important;
+            font-size: 13px !important;
+            color: #000 !important;
+        }
+        .no-print, header, footer, .navbar, .announcement-bar, #chat-widget-btn {
+            display: none !important;
+        }
+        .invoice-card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+        .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+
+<div class="container py-4 py-md-5">
+    <!-- Top Action Bar (ẩn khi in) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print flex-wrap gap-2">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Về Trang Chủ
+        </a>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                <i class="bi bi-printer-fill me-2"></i> In Hóa Đơn / Xuất PDF
+            </button>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-dark rounded-pill px-3">
+                Mua Thêm Sản Phẩm
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Invoice Card -->
+    <div class="card border shadow-sm rounded-4 p-4 p-md-5 bg-white invoice-card mx-auto" style="max-width: 850px;">
+        <!-- Header: Logo & Store Info -->
+        <div class="row pb-4 border-bottom align-items-center">
+            <div class="col-sm-7">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                        <i class="bi bi-droplet-half fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0 font-serif text-danger">@(string.IsNullOrEmpty(site.SiteName) ? "GlowCare Skincare Lab" : site.SiteName)</h4>
+                        <small class="text-muted">Chuyên Dược Mỹ Phẩm & Hoạt Chất Chăm Sóc Da</small>
+                    </div>
+                </div>
+                <div class="small text-muted ps-1">
+                    <div><i class="bi bi-geo-alt me-1"></i> @(string.IsNullOrEmpty(site.Address) ? "123 Đường Bà Triệu, Q. Hai Bà Trưng, Hà Nội" : site.Address)</div>
+                    <div><i class="bi bi-telephone me-1"></i> Hotline: @(string.IsNullOrEmpty(site.Hotline) ? "1900 6868" : site.Hotline) • Email: cskh@glowcare.vn</div>
+                    <div><i class="bi bi-globe me-1"></i> Website: https://glowcare.vn</div>
+                </div>
+            </div>
+            <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                <div class="badge bg-danger-subtle text-danger px-3 py-1.5 rounded-pill fw-bold text-uppercase mb-2">
+                    HÓA ĐƠN BÁN HÀNG
+                </div>
+                <h5 class="fw-bold text-dark font-monospace mb-1">#@Model.OrderId</h5>
+                <div class="small text-muted">Ngày xuất: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                <div class="small text-muted">Trạng thái: <span class="badge @(Model.PaymentStatus.Contains("Đã thanh toán") ? "bg-success" : "bg-warning text-dark")">@Model.PaymentStatus</span></div>
+            </div>
+        </div>
+
+        <!-- Customer & Shipping Information -->
+        <div class="row py-3 border-bottom">
+            <div class="col-md-6 mb-2 mb-md-0">
+                <h6 class="fw-bold text-uppercase small text-muted mb-2">Khách Hàng:</h6>
+                <div class="fw-bold text-dark fs-6">@customerName</div>
+                <div class="small text-muted"><i class="bi bi-telephone me-1"></i> Số điện thoại: <b>@customerPhone</b></div>
+                @if (!string.IsNullOrEmpty(customerEmail) && customerEmail != "Chưa cập nhật")
+                {
+                    <div class="small text-muted"><i class="bi bi-envelope me-1"></i> Email: @customerEmail</div>
+                }
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-uppercase small text-muted mb-2">Thông Tin Giao Nhận:</h6>
+                <div class="small"><b>Địa chỉ nhận:</b> @Model.ShippingAddress, @Model.ShippingProvince</div>
+                <div class="small"><b>Phương thức:</b> @(Model.PaymentMethod == "VIETQR" ? "Chuyển khoản Ngân hàng (VietQR)" : "Thanh toán khi nhận hàng (COD)")</div>
+                @if (!string.IsNullOrEmpty(Model.Note))
+                {
+                    <div class="small text-muted fst-italic"><b>Ghi chú:</b> @Model.Note</div>
+                }
+            </div>
+        </div>
+
+        <!-- Order Items Table -->
+        <div class="table-responsive my-3">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead class="table-light">
+                    <tr class="small text-uppercase">
+                        <th style="width: 50px;" class="text-center">STT</th>
+                        <th>Tên Dược Mỹ Phẩm</th>
+                        <th style="width: 80px;" class="text-center">ĐVT</th>
+                        <th style="width: 90px;" class="text-center">Số lượng</th>
+                        <th style="width: 140px;" class="text-end">Đơn giá</th>
+                        <th style="width: 150px;" class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                    }
+                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                    {
+                        foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td class="text-center">@(stt++)</td>
+                                <td>
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <small class="text-muted font-monospace">Mã: @item.ProductId</small>
+                                </td>
+                                <td class="text-center">Chai/Hộp</td>
+                                <td class="text-center fw-bold">@item.Quantity</td>
+                                <td class="text-end">@item.UnitPrice.ToString("N0") ₫</td>
+                                <td class="text-end fw-bold">@item.LineTotal.ToString("N0") ₫</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>
+                                <div class="fw-semibold">Đơn hàng dược mỹ phẩm GlowCare</div>
+                            </td>
+                            <td class="text-center">Combo</td>
+                            <td class="text-center fw-bold">1</td>
+                            <td class="text-end">@Model.Subtotal.ToString("N0") ₫</td>
+                            <td class="text-end fw-bold">@Model.Subtotal.ToString("N0") ₫</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="row justify-content-end mb-4">
+            <div class="col-md-6 col-lg-5">
+                <div class="bg-light p-3 rounded-3 small">
+                    <div class="d-flex justify-content-between mb-1.5">
+                        <span class="text-muted">Tạm tính tiền hàng:</span>
+                        <span class="fw-semibold">@Model.Subtotal.ToString("N0") ₫</span>
+                    </div>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-1.5 text-success">
+                            <span>Voucher giảm giá (@Model.CouponCode):</span>
+                            <span class="fw-semibold">-@Model.DiscountAmount.ToString("N0") ₫</span>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between mb-1.5">
+                        <span class="text-muted">Phí vận chuyển giao hàng:</span>
+                        <span class="fw-semibold">@Model.ShippingFee.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-2 border-top fs-6 fw-bold">
+                        <span class="text-dark">TỔNG CỘNG THANH TOÁN:</span>
+                        <span class="text-danger">@Model.TotalAmount.ToString("N0") ₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.PaymentMethod == "VIETQR")
+        {
+            <div class="p-3 border rounded-3 bg-light d-flex align-items-center gap-3 mb-4">
+                <img src="https://api.vietqr.io/image/970422-0901234567-compact2.jpg?amount=@((long)Model.TotalAmount)&addInfo=@Model.OrderId"
+                     alt="VietQR" class="img-fluid rounded border bg-white p-1" style="width: 90px; height: 90px;" />
+                <div class="small">
+                    <div class="fw-bold text-success"><i class="bi bi-shield-check me-1"></i> Thông Tin Chuyển Khoản VietQR</div>
+                    <div>Ngân hàng: <b>MB Bank (Ngân hàng Quân Đội)</b> • STK: <b>0901234567</b></div>
+                    <div>Chủ tài khoản: <b>GLOWCARE SKINCARE LAB</b></div>
+                    <div>Nội dung CK: <b class="text-danger">@Model.OrderId</b></div>
+                </div>
+            </div>
+        }
+
+        <!-- Signature Section -->
+        <div class="row pt-4 text-center">
+            <div class="col-6">
+                <p class="fw-bold mb-1 small text-uppercase">Khách Hàng</p>
+                <small class="text-muted fst-italic">(Ký, ghi rõ họ tên)</small>
+                <div style="height: 60px;"></div>
+                <p class="fw-semibold mb-0 small">@customerName</p>
+            </div>
+            <div class="col-6">
+                <p class="fw-bold mb-1 small text-uppercase">Đại Diện GlowCare Lab</p>
+                <small class="text-muted fst-italic">(Xác nhận điện tử)</small>
+                <div style="height: 60px;" class="d-flex align-items-center justify-content-center">
+                    <span class="badge bg-success-subtle text-success border border-success px-3 py-1 font-monospace">
+                        <i class="bi bi-check-all me-1"></i> ĐÃ XÁC THỰC
+                    </span>
+                </div>
+                <p class="fw-semibold mb-0 small">GlowCare Skincare System</p>
+            </div>
+        </div>
+
+        <!-- Footer Thank You Note -->
+        <div class="mt-4 pt-3 border-top text-center text-muted small">
+            <i class="bi bi-heart-fill text-danger me-1"></i> Cảm ơn quý khách đã tin tưởng và đồng hành cùng GlowCare Skincare Lab!
+        </div>
+    </div>
+</div>

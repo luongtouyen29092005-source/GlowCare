@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "403 - Quyền Truy Cập Bị Từ Chối";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-shield-slash-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="fw-bold font-serif text-danger mb-2">403 - Truy Cập Bị Chặn</h2>
+                <h5 class="fw-semibold text-dark mb-3">Tài khoản của bạn không có quyền truy cập trang này!</h5>
+                <p class="text-muted small mb-4">
+                    Tính năng bạn đang cố truy cập yêu cầu vai trò cao hơn (như <b>Quản trị viên</b> hoặc <b>Thủ kho / Bán hàng</b>). 
+                    Hệ thống kiểm soát phân quyền (RBAC) đã chặn yêu cầu này để đảm bảo an toàn dữ liệu.
+                </p>
+
+                <div class="d-grid gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-rose py-2 fw-semibold">
+                        <i class="bi bi-house-door me-1"></i> Quay về Trang Chủ
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary py-2">
+                        <i class="bi bi-arrow-left-right me-1"></i> Đăng Nhập Với Tài Khoản Khác (Admin/Thủ Kho)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

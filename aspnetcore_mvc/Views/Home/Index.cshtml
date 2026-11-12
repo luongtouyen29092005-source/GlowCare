@@ -1,0 +1,294 @@
+@model IEnumerable<GlowCare_AspNetCore_MVC.Models.Product>
+@inject GlowCare_AspNetCore_MVC.Data.ApplicationDbContext _homeDbContext
+@{
+    ViewData["Title"] = "Trang Chủ - Cửa Hàng Dược Mỹ Phẩm";
+    var siteSetting = _homeDbContext.SiteSettings.FirstOrDefault() ?? new GlowCare_AspNetCore_MVC.Models.SiteSetting();
+    var bannerImg = string.IsNullOrEmpty(siteSetting.HeroImageUrl) 
+        ? "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1600&q=85" 
+        : siteSetting.HeroImageUrl;
+}
+
+<!-- ========================================================================= -->
+<!-- 1. SKINCARE VISUAL HERO BANNER (HÌNH ẢNH CHUYÊN NGHIỆP, TỐI GIẢN CHỮ)      -->
+<!-- ========================================================================= -->
+<section class="py-3 bg-light border-bottom">
+    <div class="container">
+        <div class="row g-3">
+            <!-- Main Visual Banner Slider (Col 8/12) -->
+            <div class="col-lg-8">
+                <div id="skincareHeroCarousel" class="carousel slide carousel-fade rounded-4 shadow-sm overflow-hidden h-100" data-bs-ride="carousel" data-bs-interval="4500">
+                    <!-- Indicators -->
+                    <div class="carousel-indicators mb-2">
+                        <button type="button" data-bs-target="#skincareHeroCarousel" data-bs-slide-to="0" class="active rounded-pill" style="width: 28px; height: 5px;"></button>
+                        <button type="button" data-bs-target="#skincareHeroCarousel" data-bs-slide-to="1" class="rounded-pill" style="width: 28px; height: 5px;"></button>
+                        <button type="button" data-bs-target="#skincareHeroCarousel" data-bs-slide-to="2" class="rounded-pill" style="width: 28px; height: 5px;"></button>
+                    </div>
+
+                    <div class="carousel-inner h-100" style="min-height: 380px;">
+                        <!-- Slide 1: Banner chính tùy biến từ Admin -->
+                        <div class="carousel-item active h-100 position-relative" style="min-height: 380px;">
+                            <img src="@bannerImg" 
+                                 class="d-block w-100 h-100 object-fit-cover" 
+                                 alt="@siteSetting.HeroTitle"
+                                 style="min-height: 380px; max-height: 440px; object-fit: cover;">
+                            <!-- Subtle Gradient Overlay -->
+                            <div class="position-absolute inset-0 w-100 h-100 top-0 start-0 d-flex align-items-center" 
+                                 style="background: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.35) 55%, transparent 100%);">
+                                <div class="p-4 p-md-5 text-white" style="max-width: 520px;">
+                                    <span class="badge rounded-pill px-3 py-1.5 mb-2 text-white fw-bold shadow-xs text-uppercase" style="background-color: var(--gc-primary); font-size: 0.75rem;">
+                                        <i class="bi bi-stars me-1"></i> @(string.IsNullOrEmpty(siteSetting.HeroBadge) ? "Dược Mỹ Phẩm Chính Hãng" : siteSetting.HeroBadge)
+                                    </span>
+                                    <h2 class="display-6 fw-bold font-serif mb-2 text-white lh-sm">
+                                        @(string.IsNullOrEmpty(siteSetting.HeroTitle) ? "Phục Hồi Làn Da Tỏa Sáng" : siteSetting.HeroTitle)
+                                    </h2>
+                                    <p class="small text-white-50 mb-3 d-none d-sm-block text-truncate-2" style="max-width: 420px;">
+                                        @(string.IsNullOrEmpty(siteSetting.HeroSubtitle) ? "Quy trình chăm sóc da chuẩn chuyên gia da liễu với các hoạt chất cao cấp." : siteSetting.HeroSubtitle)
+                                    </p>
+                                    <a href="@siteSetting.HeroButtonLink" class="btn btn-rose rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                                        <span>@(string.IsNullOrEmpty(siteSetting.HeroButtonText) ? "Mua Sắm Ngay" : siteSetting.HeroButtonText)</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Serum & Tinh chất phục hồi -->
+                        <div class="carousel-item h-100 position-relative" style="min-height: 380px;">
+                            <img src="https://images.unsplash.com/photo-1608248597359-2ffdb9556819?auto=format&fit=crop&w=1600&q=85" 
+                                 class="d-block w-100 h-100 object-fit-cover" 
+                                 alt="Serum tinh chất phục hồi"
+                                 style="min-height: 380px; max-height: 440px; object-fit: cover;">
+                            <div class="position-absolute inset-0 w-100 h-100 top-0 start-0 d-flex align-items-center" 
+                                 style="background: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.35) 55%, transparent 100%);">
+                                <div class="p-4 p-md-5 text-white" style="max-width: 520px;">
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 mb-2 fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-lightning-charge-fill me-1"></i> Xu Hướng Skincare 2026
+                                    </span>
+                                    <h2 class="display-6 fw-bold font-serif mb-2 text-white lh-sm">
+                                        Serum Tinh Chất & Cấp Ẩm Chuyên Sâu
+                                    </h2>
+                                    <p class="small text-white-50 mb-3 d-none d-sm-block">
+                                        Niacinamide, B5 & Ceramide tái sinh hàng rào sinh học của da.
+                                    </p>
+                                    <a asp-controller="Products" asp-action="Index" asp-route-category="Serum & Tinh chất" class="btn btn-light text-dark rounded-pill px-4 py-2 fw-bold shadow-sm">
+                                        Xem Bộ Sưu Tập Serum <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Chống nắng & Làm sạch tinh khiết -->
+                        <div class="carousel-item h-100 position-relative" style="min-height: 380px;">
+                            <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1600&q=85" 
+                                 class="d-block w-100 h-100 object-fit-cover" 
+                                 alt="Kem chống nắng & Dưỡng ẩm"
+                                 style="min-height: 380px; max-height: 440px; object-fit: cover;">
+                            <div class="position-absolute inset-0 w-100 h-100 top-0 start-0 d-flex align-items-center" 
+                                 style="background: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.35) 55%, transparent 100%);">
+                                <div class="p-4 p-md-5 text-white" style="max-width: 520px;">
+                                    <span class="badge bg-success rounded-pill px-3 py-1.5 mb-2 fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-shield-check me-1"></i> Kháng Tia UV Tối Đa
+                                    </span>
+                                    <h2 class="display-6 fw-bold font-serif mb-2 text-white lh-sm">
+                                        Màng Lọc Phổ Rộng Kháng Nắng Hoàn Hảo
+                                    </h2>
+                                    <p class="small text-white-50 mb-3 d-none d-sm-block">
+                                        Kiềm dầu, chống trôi nước mồ hôi và nâng tông tự nhiên suốt ngày dài.
+                                    </p>
+                                    <a asp-controller="Products" asp-action="Index" asp-route-category="Chống nắng" class="btn btn-rose rounded-pill px-4 py-2 fw-bold shadow-sm">
+                                        Khám Phá Kem Chống Nắng <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#skincareHeroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon rounded-circle bg-dark/40 p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Trước</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#skincareHeroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon rounded-circle bg-dark/40 p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Sau</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Side Visual Skincare Promo Banners (Col 4/12) -->
+            <div class="col-lg-4 d-flex flex-column gap-3">
+                <!-- Promo Tile 1: Chẩn Đoán Da -->
+                <div class="card border-0 rounded-4 overflow-hidden shadow-sm flex-fill position-relative text-white" 
+                     style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(88, 28, 135, 0.7) 100%), url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80') center/cover; min-height: 180px;">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
+                        <div>
+                            <span class="badge bg-light text-dark rounded-pill px-2.5 py-1 text-uppercase fw-bold mb-2" style="font-size: 0.68rem;">
+                                <i class="bi bi-magic text-danger me-1"></i> Bác Sĩ Da Liễu
+                            </span>
+                            <h5 class="fw-bold font-serif mb-1 text-white">Chẩn Đoán Loại Da</h5>
+                            <p class="small text-white-50 mb-0">Trả lời 4 câu hỏi để tìm đúng chu trình skincare</p>
+                        </div>
+                        <div class="pt-2">
+                            <a asp-controller="Home" asp-action="SkinQuiz" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-dark shadow-xs">
+                                Thử Ngay Miễn Phí <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo Tile 2: Khuyến Mãi Mùa Hè -->
+                <div class="card border-0 rounded-4 overflow-hidden shadow-sm flex-fill position-relative text-white" 
+                     style="background: linear-gradient(135deg, rgba(136, 19, 55, 0.85) 0%, rgba(225, 29, 72, 0.7) 100%), url('https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80') center/cover; min-height: 180px;">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
+                        <div>
+                            <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 text-uppercase fw-bold mb-2" style="font-size: 0.68rem;">
+                                <i class="bi bi-tag-fill me-1"></i> Giảm Đến 20%
+                            </span>
+                            <h5 class="fw-bold font-serif mb-1 text-white">Tuần Lễ Dược Mỹ Phẩm</h5>
+                            <p class="small text-white-50 mb-0">Nhập mã <b>GLOW20</b> cho đơn hàng từ 300K</p>
+                        </div>
+                        <div class="pt-2">
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-white bg-white text-danger rounded-pill px-3 fw-bold shadow-xs">
+                                Săn Ưu Đãi <i class="bi bi-bag-heart ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Visual Shortcuts (Thanh danh mục ảnh tròn tiện lợi) -->
+        <div class="row g-2 mt-3 pt-2 text-center">
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Làm sạch" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-rose-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #ffe4e6;">
+                        <i class="bi bi-droplet text-danger fs-5"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Làm Sạch</span>
+                </a>
+            </div>
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Toner & Nước cân bằng" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-primary-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #e0f2fe;">
+                        <i class="bi bi-water text-primary fs-5"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Nước Cân Bằng</span>
+                </a>
+            </div>
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Serum & Tinh chất" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-warning-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #fef3c7;">
+                        <i class="bi bi-gem text-warning fs-5"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Serum Tinh Chất</span>
+                </a>
+            </div>
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Kem dưỡng ẩm" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-success-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #dcfce7;">
+                        <i class="bi bi-flower1 text-success fs-5"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Kem Dưỡng Ẩm</span>
+                </a>
+            </div>
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Chống nắng" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-danger-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #fee2e2;">
+                        <i class="bi bi-sun text-danger fs-5"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Chống Nắng</span>
+                </a>
+            </div>
+            <div class="col-4 col-sm-2">
+                <a asp-controller="Products" asp-action="Index" asp-route-category="Đặc trị & Tẩy da chết" class="text-decoration-none text-dark d-block p-2 rounded-3 bg-white border hover-shadow transition-all">
+                    <div class="rounded-circle bg-secondary-subtle mx-auto mb-1 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #f3e8ff;">
+                        <i class="bi bi-shield-plus text-purple fs-5" style="color: #9333ea;"></i>
+                    </div>
+                    <span class="small fw-bold d-block text-truncate">Đặc Trị Mụn</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- 2. DANH SÁCH SẢN PHẨM NỔI BẬT                                             -->
+<!-- ========================================================================= -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold font-serif mb-1">Sản Phẩm Skincare Nổi Bật</h2>
+                <p class="text-muted small mb-0">Tuyển chọn các hoạt chất phục hồi, trị mụn và chống nắng hàng đầu</p>
+            </div>
+            <a asp-controller="Products" asp-action="Index" class="text-danger fw-semibold text-decoration-none">
+                Xem tất cả (@Model.Count() sản phẩm) <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card card-product h-100 p-3">
+                        <div class="position-relative mb-3">
+                            <img src="@item.ImageUrl" class="card-img-top rounded-3" alt="@item.ProductName" style="height: 220px; object-fit: cover;">
+                            @if (item.DiscountPercent > 0)
+                            {
+                                <span class="position-absolute top-0 start-0 badge bg-danger m-2">
+                                    -@item.DiscountPercent%
+                                </span>
+                            }
+                            @if (item.StockCount <= 5 && item.StockCount > 0)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-2">
+                                    Sắp hết
+                                </span>
+                            }
+                        </div>
+                        <div class="card-body p-0 d-flex flex-column">
+                            <div class="text-muted small mb-1">@(item.Brand?.BrandName ?? "Chính Hãng")</div>
+                            <h6 class="card-title fw-semibold text-truncate-2 mb-2" style="height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="text-dark text-decoration-none">
+                                    @item.ProductName
+                                </a>
+                            </h6>
+                            <div class="d-flex align-items-center gap-1 mb-2 text-warning small">
+                                <i class="bi bi-star-fill"></i>
+                                <span class="text-dark fw-bold">@item.Rating</span>
+                                <span class="text-muted">(@item.ReviewCount)</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-top">
+                                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                                    <div class="fw-bold text-danger fs-5">
+                                        @item.Price.ToString("N0") ₫
+                                    </div>
+                                    @if (item.OriginalPrice > item.Price)
+                                    {
+                                        <small class="text-muted text-decoration-line-through">
+                                            @item.OriginalPrice.ToString("N0") ₫
+                                        </small>
+                                    }
+                                </div>
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex gap-1.5">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1.5 fw-semibold flex-fill d-flex align-items-center justify-content-center gap-1 shadow-xs" title="Thêm vào giỏ">
+                                        <i class="bi bi-cart-plus"></i>
+                                        <span class="small">Thêm Giỏ</span>
+                                    </button>
+                                    <a asp-controller="Cart" asp-action="BuyNow" asp-route-productId="@item.ProductId" class="btn btn-sm btn-rose rounded-pill px-2.5 py-1.5 fw-semibold flex-fill text-center d-flex align-items-center justify-content-center gap-1 shadow-xs" title="Mua ngay">
+                                        <i class="bi bi-lightning-charge-fill"></i>
+                                        <span class="small">Mua Ngay</span>
+                                    </a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

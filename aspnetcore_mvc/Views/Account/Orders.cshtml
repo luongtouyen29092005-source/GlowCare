@@ -1,0 +1,102 @@
+@model List<GlowCare_AspNetCore_MVC.Models.Order>
+@{
+    ViewData["Title"] = "Đơn Hàng Của Tôi";
+    var user = ViewBag.User as GlowCare_AspNetCore_MVC.Models.User;
+}
+
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold font-serif mb-1"><i class="bi bi-box2-heart text-danger me-2"></i>Đơn Hàng Của Tôi</h2>
+            <p class="text-muted small mb-0">Lịch sử các đơn hàng được liên kết với tài khoản: <b>@user?.FullName</b> (@user?.Email)</p>
+        </div>
+        <div>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-rose btn-sm px-3">
+                <i class="bi bi-bag-plus me-1"></i> Mua Thêm Sản Phẩm
+            </a>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+            <i class="bi bi-cart-x text-muted mb-3" style="font-size: 3.5rem;"></i>
+            <h5 class="fw-bold">Bạn chưa có đơn hàng nào!</h5>
+            <p class="text-muted small">Hãy khám phá các sản phẩm dược mỹ phẩm chính hãng và đặt đơn hàng đầu tiên của bạn.</p>
+            <div class="mt-2">
+                <a asp-controller="Products" asp-action="Index" class="btn btn-rose px-4 py-2 fw-semibold">
+                    Xem Danh Sách Sản Phẩm
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var order in Model)
+            {
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                        <div class="card-header bg-light py-3 px-4 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fw-bold text-danger">#@order.OrderId</span>
+                                <span class="text-muted small">| Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge @(order.OrderStatus == "Đã giao hàng" || order.OrderStatus == "Đã hoàn thành" ? "bg-success" : order.OrderStatus == "Chờ xác nhận" ? "bg-warning text-dark" : "bg-primary") px-3 py-1.5 rounded-pill">
+                                    @order.OrderStatus
+                                </span>
+                                <span class="badge bg-secondary px-2 py-1.5 rounded-pill small">
+                                    @order.PaymentMethod (@order.PaymentStatus)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle mb-0">
+                                    <thead class="text-muted small border-bottom">
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (order.OrderItems != null)
+                                        {
+                                            @foreach (var item in order.OrderItems)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-semibold">@item.ProductName</div>
+                                                        <small class="text-muted">Mã: @item.ProductId</small>
+                                                    </td>
+                                                    <td class="text-center">@item.Quantity</td>
+                                                    <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                                                    <td class="text-end fw-bold text-danger">@item.LineTotal.ToString("N0") đ</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-4 py-3 border-top d-flex flex-wrap justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                <i class="bi bi-geo-alt me-1"></i> Giao tới: <b>@order.ShippingAddress, @order.ShippingProvince</b>
+                            </div>
+                            <div class="text-end d-flex align-items-center gap-2">
+                                <span class="text-muted small">Tổng tiền:</span>
+                                <span class="fs-5 fw-bold text-danger me-2">@order.TotalAmount.ToString("N0") đ</span>
+                                <a asp-controller="Cart" asp-action="Invoice" asp-route-id="@order.OrderId" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-semibold">
+                                    <i class="bi bi-printer me-1"></i> In Hóa Đơn
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

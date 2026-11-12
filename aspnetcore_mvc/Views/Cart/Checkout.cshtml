@@ -1,0 +1,146 @@
+@model GlowCare_AspNetCore_MVC.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Thanh Toán Đơn Hàng";
+    var subtotal = ViewBag.Subtotal != null ? (decimal)ViewBag.Subtotal : 0m;
+    var shippingFee = ViewBag.ShippingFee != null ? (decimal)ViewBag.ShippingFee : 30000m;
+    var total = ViewBag.Total != null ? (decimal)ViewBag.Total : (subtotal + shippingFee);
+}
+
+<div class="container py-4 py-md-5">
+    <div class="mb-4">
+        <h2 class="font-serif fw-bold text-dark mb-1">Thông Tin Đặt Hàng & Thanh Toán</h2>
+        <p class="text-muted small">Vui lòng kiểm tra địa chỉ nhận hàng và chọn phương thức thanh toán phù hợp</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger shadow-sm rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Vui lòng kiểm tra lại thông tin bên dưới:</strong>
+            @Html.ValidationSummary(false, "", new { @class = "mb-0 mt-1 small" })
+        </div>
+    }
+
+    <form asp-action="Checkout" method="post" id="checkoutForm" onsubmit="ensureDefaults()">
+        @Html.AntiForgeryToken()
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Địa Chỉ Nhận Hàng</h5>
+                    
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label small fw-bold">Họ và tên người nhận</label>
+                        <input asp-for="FullName" class="form-control" id="customerFullName" placeholder="Ví dụ: Phạm Thu Uyên" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label small fw-bold">Số điện thoại <span class="text-danger">*</span></label>
+                            <input asp-for="Phone" class="form-control" id="customerPhone" placeholder="Ví dụ: 0987654321" required />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label small fw-bold">Email (Nhận hóa đơn)</label>
+                            <input asp-for="Email" type="email" class="form-control" id="customerEmail" placeholder="email@gmail.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Province" class="form-label small fw-bold">Tỉnh / Thành phố</label>
+                        <select asp-for="Province" class="form-select" id="customerProvince">
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                            <option value="Đà Nẵng">Đà Nẵng</option>
+                            <option value="Hải Phòng">Hải Phòng</option>
+                            <option value="Cần Thơ">Cần Thơ</option>
+                            <option value="Bình Dương">Bình Dương</option>
+                            <option value="Đồng Nai">Đồng Nai</option>
+                            <option value="Quảng Ninh">Quảng Ninh</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label small fw-bold">Địa chỉ chi tiết (Số nhà, tên đường)</label>
+                        <input asp-for="Address" class="form-control" id="customerAddress" placeholder="Ví dụ: 123 Phố Huế, P. Hàng Bài" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Note" class="form-label small fw-bold">Ghi chú giao hàng</label>
+                        <textarea asp-for="Note" class="form-control" rows="2" placeholder="Giao giờ hành chính, gọi trước khi giao..."></textarea>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3"><i class="bi bi-credit-card-fill text-danger me-2"></i>Phương Thức Thanh Toán</h5>
+                    <div class="form-check p-3 border rounded-3 mb-2 bg-light">
+                        <input class="form-check-input ms-0 me-3" type="radio" asp-for="PaymentMethod" value="VIETQR" checked id="payVietQr">
+                        <label class="form-check-label fw-semibold text-dark" for="payVietQr">
+                            <i class="bi bi-qr-code text-success me-1"></i> Chuyển khoản Ngân hàng (Quét mã VietQR 24/7)
+                        </label>
+                        <div class="text-muted small ps-4 mt-1">Hệ thống tạo mã VietQR tự động, thanh toán xác nhận tức thì.</div>
+                    </div>
+                    <div class="form-check p-3 border rounded-3 mb-2 bg-light">
+                        <input class="form-check-input ms-0 me-3" type="radio" asp-for="PaymentMethod" value="COD" id="payCod">
+                        <label class="form-check-label fw-semibold text-dark" for="payCod">
+                            <i class="bi bi-cash-stack text-warning me-1"></i> Thanh toán khi nhận hàng (COD)
+                        </label>
+                        <div class="text-muted small ps-4 mt-1">Kiểm tra mỹ phẩm chính hãng trước khi thanh toán tiền mặt cho shipper.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-3">Đơn Hàng Của Bạn</h5>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-bold">Mã giảm giá ưu đãi</label>
+                        <div class="input-group">
+                            <input asp-for="CouponCode" id="couponInput" class="form-control text-uppercase font-monospace" placeholder="Nhập GLOW20" />
+                            <button class="btn btn-outline-dark" type="button" onclick="var el = document.getElementById('couponSuccess'); if(el) el.classList.remove('d-none');">Áp dụng</button>
+                        </div>
+                        <div id="couponSuccess" class="d-none alert alert-success py-1 px-2 mt-1 small">
+                            <i class="bi bi-check-circle-fill me-1"></i> Đã áp dụng mã giảm giá 20% thành công!
+                        </div>
+                        <small class="text-muted">Nhập <b>GLOW20</b> để giảm ngay 20% cho đơn hàng.</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-semibold">@subtotal.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Phí ship:</span>
+                        <span class="fw-semibold">@shippingFee.ToString("N0") ₫</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fs-5 fw-bold">Tổng cộng:</span>
+                        <span class="fs-4 fw-bold text-danger">@total.ToString("N0") ₫</span>
+                    </div>
+
+                    <button type="submit" id="btnSubmitCheckout" class="btn btn-rose w-100 py-3 fw-bold fs-5 shadow-sm">
+                        <i class="bi bi-bag-check-fill me-2"></i> Xác Nhận Đặt Hàng Ngay
+                    </button>
+                    
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="bi bi-shield-check text-success me-1"></i> Cam kết 100% Dược Mỹ Phẩm Chính Hãng
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function ensureDefaults() {
+        var fullNameInput = document.getElementById('customerFullName');
+        if (fullNameInput && !fullNameInput.value.trim()) {
+            fullNameInput.value = "Khách hàng GlowCare";
+        }
+        var addressInput = document.getElementById('customerAddress');
+        if (addressInput && !addressInput.value.trim()) {
+            addressInput.value = "Tại địa chỉ đăng ký";
+        }
+    }
+</script>

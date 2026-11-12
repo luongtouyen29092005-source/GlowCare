@@ -1,0 +1,78 @@
+@model GlowCare_AspNetCore_MVC.Models.Product
+@{
+    ViewData["Title"] = Model.ProductName;
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">Sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.ProductName</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-3 bg-white">
+                <img src="@Model.ImageUrl" alt="@Model.ProductName" class="img-fluid rounded-3" style="max-height: 450px; object-fit: cover; width: 100%;">
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold">
+                    @Model.Category?.CategoryName
+                </span>
+                <span class="text-muted small">Thương hiệu: <b>@Model.Brand?.BrandName (@Model.Brand?.Country)</b></span>
+            </div>
+
+            <h2 class="fw-bold font-serif mb-3">@Model.ProductName</h2>
+
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="text-warning">
+                    <i class="bi bi-star-fill"></i> @Model.Rating / 5.0
+                </div>
+                <span class="text-muted">(@Model.ReviewCount đánh giá)</span>
+                <span class="badge @(Model.StockCount > 0 ? "bg-success" : "bg-danger")">
+                    @(Model.StockCount > 0 ? $"Còn hàng ({Model.StockCount})" : "Tạm hết hàng")
+                </span>
+            </div>
+
+            <div class="p-3 bg-light rounded-4 mb-4 d-flex align-items-baseline gap-3">
+                <span class="fs-2 fw-bold text-danger">@Model.Price.ToString("N0") ₫</span>
+                @if (Model.OriginalPrice > Model.Price)
+                {
+                    <span class="fs-5 text-muted text-decoration-line-through">@Model.OriginalPrice.ToString("N0") ₫</span>
+                    <span class="badge bg-danger">Tiết kiệm @Model.DiscountPercent%</span>
+                }
+            </div>
+
+            <p class="text-muted leading-relaxed mb-4">
+                @Model.ShortDesc
+            </p>
+
+            <div class="mb-4">
+                <h6 class="fw-bold"><i class="bi bi-check2-circle text-success me-1"></i> Loại da phù hợp:</h6>
+                <p class="small text-secondary mb-2">@Model.SkinTypes</p>
+                <h6 class="fw-bold"><i class="bi bi-droplet text-primary me-1"></i> Hoạt chất chính:</h6>
+                <p class="small text-secondary mb-0">@Model.KeyIngredients</p>
+            </div>
+
+            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex flex-wrap gap-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model.ProductId" />
+                <div class="input-group" style="width: 130px;">
+                    <span class="input-group-text bg-white">SL</span>
+                    <input type="number" name="quantity" value="1" min="1" max="@Model.StockCount" class="form-control text-center" />
+                </div>
+                <button type="submit" class="btn btn-outline-danger px-4 py-3 fw-bold flex-grow-1">
+                    <i class="bi bi-cart-plus me-2"></i> Thêm Vào Giỏ Hàng
+                </button>
+                <a asp-controller="Cart" asp-action="BuyNow" asp-route-productId="@Model.ProductId" class="btn btn-rose px-4 py-3 fw-bold flex-grow-1 text-center d-flex align-items-center justify-content-center">
+                    <i class="bi bi-lightning-charge-fill me-2"></i> Mua Ngay
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

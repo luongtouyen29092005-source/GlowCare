@@ -1,0 +1,206 @@
+@model List<GlowCare_AspNetCore_MVC.Models.Category>
+@{
+    ViewData["Title"] = "Quản Lý Menu & Danh Mục Sản Phẩm";
+}
+
+<div class="container py-5">
+    <!-- Admin Navigation Tabs -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark"><i class="bi bi-shield-check"></i> Toàn quyền Super Admin</span>
+                <span class="text-muted small">Tùy biến thanh điều hướng Menu & Danh mục hiển thị trên website</span>
+            </div>
+            <h2 class="font-serif fw-bold mb-0 text-dark"><i class="bi bi-menu-button-wide text-danger me-2"></i>Quản Lý Menu & Danh Mục</h2>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+            <button class="btn btn-rose btn-sm px-3 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+                <i class="bi bi-plus-circle me-1"></i> Thêm Menu / Danh Mục Mới
+            </button>
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm px-3 rounded-pill">
+                <i class="bi bi-boxes me-1"></i> Sản Phẩm & Kho
+            </a>
+            <a asp-action="Orders" class="btn btn-outline-success btn-sm px-3 rounded-pill">
+                <i class="bi bi-receipt me-1"></i> Đơn Hàng
+            </a>
+            <a asp-action="Users" class="btn btn-outline-warning text-dark btn-sm px-3 rounded-pill">
+                <i class="bi bi-people-fill me-1"></i> Phân Quyền Nhân Viên
+            </a>
+            <a asp-action="SiteSettings" class="btn btn-outline-danger btn-sm px-3 rounded-pill">
+                <i class="bi bi-palette-fill me-1"></i> Cấu Hình Giao Diện
+            </a>
+            <a asp-action="SeedDemoData" class="btn btn-outline-info text-dark btn-sm px-3 rounded-pill fw-semibold shadow-sm" onclick="return confirm('Khởi tạo lại toàn bộ dữ liệu mẫu (Sản phẩm, Menu, Tài khoản, Cấu hình) vào CSDL?');">
+                <i class="bi bi-database-fill-gear me-1"></i> ⚡ Khởi Tạo Dữ Liệu
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4 mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light border-start border-rose border-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-info-circle-fill text-danger me-2"></i>Chưa có danh mục menu nào trong CSDL</h5>
+                    <p class="text-muted small mb-0">Nhấn nút bên phải để tự động nạp danh sách 6 menu dược mỹ phẩm chuẩn (Làm sạch, Toner, Serum, Kem dưỡng ẩm, Chống nắng, Đặc trị).</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="SeedDemoData" class="btn btn-rose rounded-pill px-4 shadow-sm fw-bold">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> ⚡ Nạp Menu Mẫu Ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Alert notes -->
+    <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4 small d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+        <div>
+            <b>Đồng bộ thời gian thực:</b> Mọi menu/danh mục bạn <b>thêm, sửa, hoặc xóa</b> tại đây sẽ lập tức được cập nhật trên thanh điều hướng Menu (Navbar) và bộ lọc tìm kiếm sản phẩm của khách hàng!
+        </div>
+    </div>
+
+    <!-- Table of Categories -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="fw-bold mb-0">Các Mục Menu Hiện Tại (@Model.Count)</h5>
+            <span class="text-muted small">Bao gồm các danh mục sản phẩm chính trên menu</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Tên Menu / Danh Mục</th>
+                        <th>Đường dẫn (Slug)</th>
+                        <th>Mô tả tóm tắt</th>
+                        <th class="text-center">Số sản phẩm</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cat in Model)
+                    {
+                        var productCount = cat.Products?.Count ?? 0;
+                        <tr>
+                            <td class="ps-4 fw-bold text-muted">#@cat.CategoryId</td>
+                            <td>
+                                <div class="fw-bold text-dark fs-6">@cat.CategoryName</div>
+                            </td>
+                            <td><code>/@cat.Slug</code></td>
+                            <td>
+                                <span class="text-muted small">@(string.IsNullOrEmpty(cat.Description) ? "Chưa có mô tả" : cat.Description)</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @(productCount > 0 ? "bg-primary-subtle text-primary border border-primary" : "bg-light text-muted border") px-2.5 py-1.5 rounded-pill">
+                                    @productCount sản phẩm
+                                </span>
+                            </td>
+                            <td class="small text-muted">@cat.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Nút Sửa Menu -->
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal-@cat.CategoryId" title="Chỉnh sửa menu này">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </button>
+
+                                    <!-- Nút Xóa Menu -->
+                                    <form asp-action="DeleteCategory" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa mục menu này?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="categoryId" value="@cat.CategoryId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa menu này" @(productCount > 0 ? "disabled" : "")>
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Modal Sửa Menu cho từng danh mục -->
+                                <div class="modal fade text-start" id="editModal-@cat.CategoryId" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow rounded-4">
+                                            <form asp-action="EditCategory" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="categoryId" value="@cat.CategoryId" />
+                                                <div class="modal-header border-bottom">
+                                                    <h5 class="modal-title fw-bold font-serif"><i class="bi bi-pencil text-primary me-2"></i>Chỉnh Sửa Menu Danh Mục</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Tên Menu / Danh Mục *</label>
+                                                        <input type="text" name="categoryName" class="form-control" value="@cat.CategoryName" required />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Đường dẫn thân thiện (Slug)</label>
+                                                        <input type="text" name="slug" class="form-control" value="@cat.Slug" />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Mô tả danh mục</label>
+                                                        <textarea name="description" class="form-control" rows="3">@cat.Description</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-top">
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary btn-sm px-3">Lưu Thay Đổi</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm Menu / Danh Mục Mới -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <form asp-action="CreateCategory" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header border-bottom bg-light rounded-top">
+                    <h5 class="modal-title fw-bold font-serif"><i class="bi bi-plus-circle text-danger me-2"></i>Thêm Mục Menu / Danh Mục Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Tên Menu / Danh Mục *</label>
+                        <input type="text" name="categoryName" class="form-control" placeholder="Ví dụ: Mặt Nạ Dưỡng Da, Chăm Sóc Cơ Thể..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Đường dẫn thân thiện (Slug)</label>
+                        <input type="text" name="slug" class="form-control" placeholder="mat-na-duong-da (tùy chọn, để trống sẽ tự tạo)" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mô tả menu</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Mô tả công dụng hoặc nhóm sản phẩm của danh mục này..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-rose btn-sm px-4 fw-bold">Thêm Ngay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
